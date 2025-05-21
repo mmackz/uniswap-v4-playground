@@ -1,11 +1,15 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { ConnectKitButton } from 'connectkit'
-import logo from '@/assets/images/logo.svg'
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useAccount } from 'wagmi';
+import { truncateEthAddress } from '@/utils/address';
 
 export function Header() {
+  const { open } = useAppKit();
+  const { address } = useAppKitAccount();
+  const { isConnected } = useAccount();
+
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -16,7 +20,7 @@ export function Header() {
             </Link>
           </div>
           <div className="flex items-center">
-            <ConnectKitButton />
+            <button onClick={() => open()}>{isConnected ? truncateEthAddress(address ?? '') : 'Connect'}</button>
           </div>
         </div>
       </div>

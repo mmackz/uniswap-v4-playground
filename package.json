@@ -12,14 +12,15 @@
     "lint:fix": "next lint --fix"
   },
   "dependencies": {
-    "@boostxyz/sdk": "5.0.0",
+    "@reown/appkit": "^1.7.6",
+    "@reown/appkit-adapter-wagmi": "^1.7.6",
     "@tanstack/react-query": "5.62.7",
-    "connectkit": "^1.8.2",
+    "@wagmi/core": "^2.17.2",
     "next": "14.2.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "viem": "2.21.45",
-    "wagmi": "2.12.32"
+    "viem": "^2.21.3",
+    "wagmi": "^2.14.12"
   },
   "devDependencies": {
     "@types/node": "^20.12.10",
