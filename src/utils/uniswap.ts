@@ -1,9 +1,17 @@
-import { Address, encodeAbiParameters, Hex, zeroAddress, zeroHash } from 'viem'
+import {
+  Address,
+  encodeAbiParameters,
+  encodeFunctionData,
+  Hex,
+  zeroAddress,
+  zeroHash,
+} from 'viem'
 import {
   EXACT_INPUT_PARAMS,
   SETTLE_ALL_PARAMS,
   SWEEP_PARAMS,
   TAKE_ALL_PARAMS,
+  V4_EXECUTE_ABI,
 } from './abi'
 import {
   ACTIONS,
@@ -92,11 +100,10 @@ export function encodeExecuteCallData(
     currencyOut === zeroAddress ? COMMAND_V4_SWAP : COMMAND_V4_SWAP_AND_SWEEP
   const inputs =
     currencyOut === zeroAddress ? [swapInput] : [swapInput, sweepInput]
-  return encodeAbiParameters(
-    [
-      { type: 'bytes', name: 'commands' },
-      { type: 'bytes[]', name: 'inputs' },
-    ],
-    [commands, inputs]
-  )
+
+  return encodeFunctionData({
+    abi: V4_EXECUTE_ABI,
+    functionName: 'execute',
+    args: [commands, inputs],
+  })
 }

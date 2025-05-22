@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useFlaunchQuote } from '../hooks/useFlaunchQuote';
 import useDebounce from '../hooks/useDebounce';
+import { useExecuteSwap } from '../hooks/useExecuteSwap';
+import { parseUnits, zeroAddress, type Address } from 'viem';
 
 const FLAUNCH_TOKEN = '0x3025e7854482bcfb770b0b204a6a8ad11c5152a9'; // Test token (QUESTION), replace with together token in production
 
@@ -21,6 +23,23 @@ const SwapInterface = () => {
     flaunchToken: FLAUNCH_TOKEN, // use Together token in production
     amount: debouncedAmount,
     side,
+  });
+
+  // Set up swap execution hook
+  const {
+    executeSwap,
+    isPending,
+    isLoading: isSwapLoading,
+    isSuccess: isSwapSuccess,
+    transactionHash,
+  } = useExecuteSwap({
+    // When buying: Input is ETH, Output is QUESTION token
+    // When selling: Input is QUESTION token, Output is ETH
+    currencyIn: side === 'buy' ? zeroAddress : FLAUNCH_TOKEN as Address,
+    currencyOut: side === 'buy' ? FLAUNCH_TOKEN as Address : zeroAddress,
+    // Convert string amounts to bigint with 18 decimals
+    amountIn: amount ? parseUnits(amount, 18) : undefined,
+    amountOutMin: quotedAmount ? parseUnits(quotedAmount, 18) : undefined,
   });
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +67,22 @@ const SwapInterface = () => {
     const num = parseFloat(quotedAmount);
     quoteDisplay = isNaN(num) ? '0.00' : num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 6});
   }
+
+  // Handle trade button state
+  const isTradeDisabled = 
+    isQuoteError || 
+    !quotedAmount || 
+    parseFloat(quotedAmount) <= 0 || 
+    !amount || 
+    parseFloat(amount) <= 0 ||
+    isPending ||
+    isSwapLoading;
+
+  // Determine trade button text based on state
+  let tradeButtonText = 'Trade';
+  if (isPending) tradeButtonText = 'Confirm in Wallet...';
+  if (isSwapLoading) tradeButtonText = 'Transaction Pending...';
+  if (isSwapSuccess) tradeButtonText = 'Trade Successful!';
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black">
@@ -109,11 +144,27 @@ const SwapInterface = () => {
         
         {/* Trade Button */}
         <button
+          onClick={executeSwap}
           className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
-          disabled={ isQuoteError || !quotedAmount || parseFloat(quotedAmount) <= 0 || !amount || parseFloat(amount) <= 0}
+          disabled={isTradeDisabled}
         >
-          Trade
+          {tradeButtonText}
         </button>
+
+        {/* Transaction Status */}
+        {isSwapSuccess && transactionHash && (
+          <div className="mt-4 p-3 bg-green-900/30 border border-green-700 rounded-lg">
+            <p className="text-green-400 text-sm">Transaction successful!</p>
+            <a 
+              href={`https://basescan.org//tx/${transactionHash}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-400 text-xs underline mt-1 block"
+            >
+              View on Etherscan
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
