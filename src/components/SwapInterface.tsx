@@ -5,15 +5,15 @@ import { useFlaunchQuote } from '../hooks/useFlaunchQuote';
 import useDebounce from '../hooks/useDebounce';
 import { useFlaunchSwap } from '../hooks/useFlaunchSwap';
 import { parseUnits, zeroAddress } from 'viem';
-import { QUESTION } from '@/utils/constants'; // use Together token in production
+import { QUESTION } from '@/utils/constants'; // ! use Together token in production
 
 const SwapInterface = () => {
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [amount, setAmount] = useState('');
   const debouncedAmount = useDebounce(amount, 500); // 500ms debounce delay
 
-  const currencyIn = side === 'buy' ? zeroAddress : QUESTION;
-  const currencyOut = side === 'buy' ? QUESTION : zeroAddress;
+  const currencyIn = side === 'buy' ? zeroAddress : QUESTION; // ! use Together token in production
+  const currencyOut = side === 'buy' ? QUESTION : zeroAddress; // ! use Together token in production
 
   const {
     data: quotedAmount,
