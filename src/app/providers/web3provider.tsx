@@ -63,7 +63,6 @@ export function Web3Provider({
   }, []);
 
   return (
-    // @ts-expect-error wtf
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{mounted ? children : null}</QueryClientProvider>
     </WagmiProvider>
