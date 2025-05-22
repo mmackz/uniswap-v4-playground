@@ -35,16 +35,16 @@ const SwapInterface = () => {
   const inputTokenSymbol = side === 'buy' ? 'ETH' : 'QUESTION';
 
   let quoteDisplay: string | React.ReactElement = '0.00';
-  if (isQuoteLoading || isQuoteFetching) {
-    quoteDisplay = <span className="text-sm text-gray-400">Fetching quote...</span>;
-  } else if (isQuoteError) {
+
+  if (isQuoteError) {
     quoteDisplay = (
       <span className="text-sm text-red-500">
         {quoteError?.message || 'Error fetching quote'}
       </span>
     );
+  } else if (!quotedAmount && (isQuoteLoading || isQuoteFetching)) {
+    quoteDisplay = <span className="text-sm text-gray-400">Fetching quote...</span>;
   } else if (quotedAmount) {
-    // Attempt to format the number to a reasonable number of decimal places
     const num = parseFloat(quotedAmount);
     quoteDisplay = isNaN(num) ? '0.00' : num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 6});
   }
@@ -102,7 +102,7 @@ const SwapInterface = () => {
           </div>
           <div className="bg-gray-700 p-3 rounded-lg text-right min-h-[50px] flex items-center justify-end">
             <span className="text-lg font-medium text-white">
-              {quoteDisplay} {outputTokenSymbol}
+              {parseFloat(amount) > 0 ? quoteDisplay : '0.00'} {outputTokenSymbol}
             </span>
           </div>
         </div>
@@ -110,9 +110,9 @@ const SwapInterface = () => {
         {/* Trade Button */}
         <button
           className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
-          disabled={isQuoteLoading || isQuoteFetching || isQuoteError || !quotedAmount || parseFloat(quotedAmount) <= 0 || !amount || parseFloat(amount) <= 0}
+          disabled={ isQuoteError || !quotedAmount || parseFloat(quotedAmount) <= 0 || !amount || parseFloat(amount) <= 0}
         >
-          {(isQuoteLoading || isQuoteFetching) ? 'Getting Quote...' : 'Trade'}
+          Trade
         </button>
       </div>
     </div>

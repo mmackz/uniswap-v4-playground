@@ -1,7 +1,7 @@
 "use client";
 
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { base, optimism } from "@reown/appkit/networks";
+import { base } from "@reown/appkit/networks";
 import { createAppKit } from "@reown/appkit/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cookieStorage, createStorage, http } from "@wagmi/core";
@@ -28,16 +28,16 @@ export const wagmiAdapter = new WagmiAdapter({
   }),
   ssr: true,
   projectId,
-  networks: [base, optimism],
+  networks: [base],
   transports: {
-    [base.id]: http(`https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_KEY}`),
+    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL),
   },
 });
 
 createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [base, optimism],
+  networks: [base],
   defaultNetwork: base,
   metadata,
   features: {

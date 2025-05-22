@@ -123,6 +123,6 @@ export const useFlaunchQuote = ({
     enabled: !!amount && parseFloat(amount) > 0,
     staleTime: 5000, // Cache quote for 5 seconds
     refetchInterval: 5000, // Refetch every 5 seconds
-    placeholderData: '0',
+    placeholderData: (previousData) => previousData ?? '0' 
   })
 }
