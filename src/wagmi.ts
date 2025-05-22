@@ -7,7 +7,7 @@ export function getConfig() {
     chains: [base],
     connectors: [
       injected(),
-      walletConnect({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID! }),
+      walletConnect({ projectId: process.env.NEXT_PUBLIC_PROJECT_ID! }),
     ],
     storage: createStorage({
       storage: cookieStorage,
