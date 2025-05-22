@@ -10,13 +10,13 @@ import {
 } from 'viem'
 import { base } from 'viem/chains'
 import { QUOTER_V4_ABI } from '@/utils/abi'
+import { 
+  flETH, 
+  flETH_Hooks, 
+  positionManager, 
+  QUOTER_ADDRESS,
+} from '@/utils/constants'
 
-const flETH_ADDRESS = '0x000000000d564d5be76f7f0d28fe52605afc7cf8' as const
-const flETH_Hooks = '0x9E433F32bb5481a9CA7DFF5b3af74A7ed041a888' as const // for hook
-const positionManagerAddress =
-  '0xF785bb58059FAB6fb19bDdA2CB9078d9E546Efdc' as const // for hook
-
-const QUOTER_ADDRESS = '0x0d5e0f971ed27fbff6c2837bf31316121532048d'
 
 const publicClient = createPublicClient({
   chain: base,
@@ -41,7 +41,7 @@ const fetchQuote = async (
       exactCurrency: zeroAddress,
       path: [
         {
-          intermediateCurrency: flETH_ADDRESS,
+          intermediateCurrency: flETH,
           fee: 0,
           tickSpacing: 60,
           hooks: flETH_Hooks,
@@ -51,7 +51,7 @@ const fetchQuote = async (
           intermediateCurrency: flaunchToken,
           fee: 0,
           tickSpacing: 60,
-          hooks: positionManagerAddress,
+          hooks: positionManager,
           hookData: zeroHash,
         },
       ],
@@ -63,10 +63,10 @@ const fetchQuote = async (
       exactCurrency: flaunchToken,
       path: [
         {
-          intermediateCurrency: flETH_ADDRESS,
+          intermediateCurrency: flETH,
           fee: 0,
           tickSpacing: 60,
-          hooks: positionManagerAddress,
+          hooks: positionManager,
           hookData: zeroHash,
         },
         {
