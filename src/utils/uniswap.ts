@@ -1,7 +1,6 @@
 import {
   Address,
   encodeAbiParameters,
-  encodeFunctionData,
   Hex,
   zeroAddress,
   zeroHash,
@@ -11,7 +10,6 @@ import {
   SETTLE_ALL_PARAMS,
   SWEEP_PARAMS,
   TAKE_ALL_PARAMS,
-  V4_EXECUTE_ABI,
 } from './abi'
 import {
   ACTIONS,
@@ -62,7 +60,7 @@ function buildSweepInput(recipient: Address) {
   return encodeAbiParameters(SWEEP_PARAMS, [zeroAddress, recipient, 0n])
 }
 
-function buildPath(currencyOut: Address) {
+export function buildPath(currencyOut: Address) {
   return [
     {
       intermediateCurrency: flETH,

@@ -4,14 +4,16 @@ import { useState } from 'react';
 import { useFlaunchQuote } from '../hooks/useFlaunchQuote';
 import useDebounce from '../hooks/useDebounce';
 import { useFlaunchSwap } from '../hooks/useFlaunchSwap';
-import { parseUnits, zeroAddress, type Address } from 'viem';
-
-const FLAUNCH_TOKEN = '0x3025e7854482bcfb770b0b204a6a8ad11c5152a9'; // Test token (QUESTION), replace with together token in production
+import { parseUnits, zeroAddress } from 'viem';
+import { QUESTION } from '@/utils/constants'; // use Together token in production
 
 const SwapInterface = () => {
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [amount, setAmount] = useState('');
   const debouncedAmount = useDebounce(amount, 500); // 500ms debounce delay
+
+  const currencyIn = side === 'buy' ? zeroAddress : QUESTION;
+  const currencyOut = side === 'buy' ? QUESTION : zeroAddress;
 
   const {
     data: quotedAmount,
@@ -20,9 +22,9 @@ const SwapInterface = () => {
     isError: isQuoteError,
     error: quoteError,
   } = useFlaunchQuote({
-    flaunchToken: FLAUNCH_TOKEN, // use Together token in production
+    currencyIn,
+    currencyOut,
     amount: debouncedAmount,
-    side,
   });
 
   // Set up swap execution hook
@@ -33,11 +35,8 @@ const SwapInterface = () => {
     isSuccess: isSwapSuccess,
     transactionHash,
   } = useFlaunchSwap({
-    // When buying: Input is ETH, Output is QUESTION token
-    // When selling: Input is QUESTION token, Output is ETH
-    currencyIn: side === 'buy' ? zeroAddress : FLAUNCH_TOKEN as Address,
-    currencyOut: side === 'buy' ? FLAUNCH_TOKEN as Address : zeroAddress,
-    // Convert string amounts to bigint with 18 decimals
+    currencyIn,
+    currencyOut,
     amountIn: amount ? parseUnits(amount, 18) : undefined,
     amountOutMin: quotedAmount ? parseUnits(quotedAmount, 18) : undefined,
   });

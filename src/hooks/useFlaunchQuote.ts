@@ -4,19 +4,14 @@ import {
   http,
   formatUnits,
   parseUnits,
-  zeroAddress,
-  zeroHash,
   Address,
 } from 'viem'
 import { base } from 'viem/chains'
 import { QUOTER_V4_ABI } from '@/utils/abi'
-import { 
-  flETH, 
-  flETH_Hooks, 
-  positionManager, 
+import {
   QUOTER_ADDRESS,
 } from '@/utils/constants'
-
+import { buildPath } from '@/utils/uniswap'
 
 const publicClient = createPublicClient({
   chain: base,
@@ -24,61 +19,19 @@ const publicClient = createPublicClient({
 })
 
 const fetchQuote = async (
-  flaunchToken: Address,
-  amount: string,
-  side: 'buy' | 'sell',
+  currencyIn: Address,
+  currencyOut: Address,
+  amount: string
 ): Promise<string> => {
   if (!amount || parseFloat(amount) <= 0) {
     return '0'
   }
   const exactAmountParsed = parseUnits(amount, 18) // all flaunch tokens have 18 decimals
 
-  let params
-
-  if (side === 'buy') {
-    // Buy QUESTION (ETH -> QUESTION)
-    params = {
-      exactCurrency: zeroAddress,
-      path: [
-        {
-          intermediateCurrency: flETH,
-          fee: 0,
-          tickSpacing: 60,
-          hooks: flETH_Hooks,
-          hookData: zeroHash,
-        },
-        {
-          intermediateCurrency: flaunchToken,
-          fee: 0,
-          tickSpacing: 60,
-          hooks: positionManager,
-          hookData: zeroHash,
-        },
-      ],
-      exactAmount: exactAmountParsed,
-    }
-  } else {
-    // Sell QUESTION (QUESTION -> ETH)
-    params = {
-      exactCurrency: flaunchToken,
-      path: [
-        {
-          intermediateCurrency: flETH,
-          fee: 0,
-          tickSpacing: 60,
-          hooks: positionManager,
-          hookData: zeroHash,
-        },
-        {
-          intermediateCurrency: zeroAddress,
-          fee: 0,
-          tickSpacing: 60,
-          hooks: flETH_Hooks,
-          hookData: zeroHash,
-        },
-      ],
-      exactAmount: exactAmountParsed,
-    }
+  const params = {
+    exactCurrency: currencyIn,
+    path: buildPath(currencyOut),
+    exactAmount: exactAmountParsed,
   }
 
   try {
@@ -107,22 +60,22 @@ const fetchQuote = async (
 }
 
 interface UseFlaunchQuoteParams {
-  flaunchToken: Address
+  currencyIn: Address
+  currencyOut: Address
   amount: string
-  side: 'buy' | 'sell'
 }
 
 export const useFlaunchQuote = ({
-  flaunchToken,
+  currencyIn,
+  currencyOut,
   amount,
-  side,
 }: UseFlaunchQuoteParams) => {
   return useQuery<string, Error>({
-    queryKey: ['flaunchQuote', flaunchToken, amount, side],
-    queryFn: () => fetchQuote(flaunchToken, amount, side),
+    queryKey: ['flaunchQuote', currencyIn, currencyOut, amount],
+    queryFn: () => fetchQuote(currencyIn, currencyOut, amount),
     enabled: !!amount && parseFloat(amount) > 0,
     staleTime: 5000, // Cache quote for 5 seconds
     refetchInterval: 5000, // Refetch every 5 seconds
-    placeholderData: (previousData) => previousData ?? '0' 
+    placeholderData: (previousData) => previousData ?? '0',
   })
 }
