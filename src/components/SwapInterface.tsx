@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFlaunchQuote } from '../hooks/useFlaunchQuote';
 import useDebounce from '../hooks/useDebounce';
-import { useExecuteSwap } from '../hooks/useExecuteSwap';
+import { useFlaunchSwap } from '../hooks/useFlaunchSwap';
 import { parseUnits, zeroAddress, type Address } from 'viem';
 
 const FLAUNCH_TOKEN = '0x3025e7854482bcfb770b0b204a6a8ad11c5152a9'; // Test token (QUESTION), replace with together token in production
@@ -32,7 +32,7 @@ const SwapInterface = () => {
     isLoading: isSwapLoading,
     isSuccess: isSwapSuccess,
     transactionHash,
-  } = useExecuteSwap({
+  } = useFlaunchSwap({
     // When buying: Input is ETH, Output is QUESTION token
     // When selling: Input is QUESTION token, Output is ETH
     currencyIn: side === 'buy' ? zeroAddress : FLAUNCH_TOKEN as Address,
@@ -144,7 +144,7 @@ const SwapInterface = () => {
         
         {/* Trade Button */}
         <button
-          onClick={executeSwap}
+          onClick={() => executeSwap()}
           className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
           disabled={isTradeDisabled}
         >
