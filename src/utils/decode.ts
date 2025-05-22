@@ -1,3 +1,5 @@
+// ! IGNORE THIS FILE, USED TO DECODE TX DATA FOR TESTING
+
 import { decodeFunctionData, decodeAbiParameters } from 'viem'
 import { EXACT_INPUT_PARAMS } from './abi'
 
