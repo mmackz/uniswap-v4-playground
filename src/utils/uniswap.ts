@@ -81,12 +81,12 @@ function buildPath(currencyOut: Address) {
   ]
 }
 
-export function encodeExecuteCallData(
+export function encodeExecuteArgs(
   currencyIn: Address,
   currencyOut: Address,
   amountIn: bigint,
   amountOutMin: bigint
-) {
+): [Hex, Hex[]] {
   const path = buildPath(currencyOut)
   const swapInput = buildSwapInput(
     currencyIn,
@@ -101,9 +101,5 @@ export function encodeExecuteCallData(
   const inputs =
     currencyOut === zeroAddress ? [swapInput] : [swapInput, sweepInput]
 
-  return encodeFunctionData({
-    abi: V4_EXECUTE_ABI,
-    functionName: 'execute',
-    args: [commands, inputs],
-  })
+  return [commands, inputs]
 }
